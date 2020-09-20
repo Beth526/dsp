@@ -69,7 +69,7 @@ Cohen's D is an example of effect size.  Other examples of effect size are:  cor
 
 You will see effect size again and again in results of algorithms that are run in data science.  For instance, in the bootcamp, when you run a regression analysis, you will recognize the t-statistic as an example of effect size.
 
-The Cohen's d for weight between the first born group and the other births group was -0.0887. This is a measure of effect size, and it says that the mean birth weight in the other births group was 0.0887 units of pooled standard deviation lower than the mean birth weight in the first borns group. This is not a significant difference.
+**Answer**: The Cohen's d for weight between the first born group and the other births group was -0.0887. This is a measure of effect size, and it says that the mean birth weight in the other births group was 0.0887 units of pooled standard deviation lower than the mean birth weight in the first borns group. This is not a significant difference.
 
 The Cohen's d for pregnancy length between the first born group and the other births group was 0.0289. This is also not a very big difference and not significant.
 
@@ -128,7 +128,7 @@ CohenEffectSize(first_length, other_length)
 This problem presents a robust example of actual vs biased data.  As a data scientist, it will be important to examine not only the data that is available, but also the data that may be missing but highly relevant.  You will see how the absence of this relevant data will bias a dataset, its distribution, and ultimately, its statistical interpretation.
 
 
-Answer: The mean of the unbiased PMF is 1.02 and the mean of the biased PMF is 2.40. This is more than twice as large because of the bias of asking children about the number of children in thier family (biased #/family), and not asking 1 caregiver per family
+**Answer:** The mean of the unbiased PMF is 1.02 and the mean of the biased PMF is 2.40. This is more than twice as large because of the bias of asking children about the number of children in thier family (biased #/family), and not asking 1 caregiver per family
 
 
 Code:
@@ -167,7 +167,7 @@ biased.Mean()
 ### Q3. [Think Stats Chapter 4 Exercise 2](4-2-random_dist.md) (random distribution)  
 This questions asks you to examine the function that produces random numbers.  Is it really random?  A good way to test that is to examine the pmf and cdf of the list of random numbers and visualize the distribution.  If you're not sure what pmf is, read more about it in Chapter 3.  
 
-Answer: The distribution is uniform becase the PMF is a horizontal line (same prob for all values) and the CDF is linear with slope = 1
+**Answer:** The distribution is uniform becase the PMF is a horizontal line (same probability for all values) and the CDF is linear with slope = 1
 
 
 Code:
@@ -193,7 +193,7 @@ This is a classic example of hypothesis testing using the normal distribution.  
 In the BRFSS (see Section 5.4), the distribution of heights is roughly normal with parameters µ = 178 cm and σ = 7.7 cm for men, and µ = 163 cm and σ = 7.3 cm for women.
 In order to join Blue Man Group, you have to be male between 5’10” and 6’1” (see http://bluemancasting.com). What percentage of the U.S. male population is in this range? Hint: use scipy.stats.norm.cdf.
 
-Answer: 34.2 percent of the US male population
+**Answer:** 34.2 percent of the US male population
 
 
 Code:
@@ -228,7 +228,9 @@ We have the prior information that Elvis did have a twin, so the probability he 
 If you use Bayes theorem the P(identical | twin) = (P(identical) * P(twin | identical) ) / P(twin)
 
 P(identical) = 1/300
+
 P(twin | identical) = 1
+
 P(twin) = P(fraternal) + P(identical) = (1/125) + (1/300) = (12/1500) + (5/1500) = (18/1500)
 
 Then plugging those values in, P(identical | twin) = 1500 / (300 * 18) = 0.278 or 27.8% chance Elvis had an identical twin
