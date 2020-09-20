@@ -69,16 +69,153 @@ Cohen's D is an example of effect size.  Other examples of effect size are:  cor
 
 You will see effect size again and again in results of algorithms that are run in data science.  For instance, in the bootcamp, when you run a regression analysis, you will recognize the t-statistic as an example of effect size.
 
+The Cohen's d for weight between the first born group and the other births group was -0.0887. This is a measure of effect size, and it says that the mean birth weight in the other births group was 0.0887 units of pooled standard deviation lower than the mean birth weight in the first borns group. This is not a significant difference.
+
+The Cohen's d for pregnancy length between the first born group and the other births group was 0.0289. This is also not a very big difference and not significant.
+
+                                   
+Code:                              
+```{python}                               
+
+import os
+
+os.chdir('/Users/beth/Documents/Metis/ThinkStats/ThinkStats2/code')
+
+import thinkstats2
+
+import math
+
+import nsfg
+
+preg = nsfg.ReadFemPreg()
+live = preg[preg.outcome == 1 ]
+
+
+preg = nsfg.ReadFemPreg()
+live = preg[preg.outcome == 1 ]
+
+firsts = live[live.birthord == 1]
+others = live[live.birthord != 1]
+
+
+first_weight=firsts.totalwgt_lb
+other_weight=others.totalwgt_lb
+
+first_length=firsts.prglngth
+other_length=others.prglngth
+
+
+def CohenEffectSize(group1, group2):
+    diff = group1.mean() - group2.mean()
+
+    var1 = group1.var()
+    var2 = group2.var()
+    n1, n2 = len(group1), len(group2)
+
+    pooled_var = (n1 * var1 + n2 * var2) / (n1 + n2)
+    d = diff / math.sqrt(pooled_var)
+    return d
+
+
+CohenEffectSize(first_weight, other_weight)
+
+CohenEffectSize(first_length, other_length)
+
+```
+        
+
 ### Q2. [Think Stats Chapter 3 Exercise 1](3-1-actual_biased.md) (actual vs. biased)
 This problem presents a robust example of actual vs biased data.  As a data scientist, it will be important to examine not only the data that is available, but also the data that may be missing but highly relevant.  You will see how the absence of this relevant data will bias a dataset, its distribution, and ultimately, its statistical interpretation.
+
+
+Answer: The mean of the unbiased PMF is 1.02 and the mean of the biased PMF is 2.40. This is more than twice as large because of the bias of asking children about the number of children in thier family (biased #/family), and not asking 1 caregiver per family
+
+
+Code:
+```{python}
+
+resp = nsfg.ReadFemResp()
+
+pmf = thinkstats2.Pmf(resp.numkdhh)
+
+
+thinkplot.Pmf(pmf, label="unbiased")
+thinkplot.Config(xlabel='Number of children', ylabel='PMF')
+
+def BiasPmf(pmf, label):
+    new_pmf = pmf.Copy(label=label)
+
+    for x, p in pmf.Items():
+        new_pmf.Mult(x, x)
+        
+    new_pmf.Normalize()
+    return new_pmf
+    
+biased = BiasPmf(pmf, label='biased')
+
+
+thinkplot.PrePlot(2)
+thinkplot.Pmfs([pmf, biased])
+thinkplot.Config(xlabel='Number of children', ylabel='PMF')
+
+pmf.Mean()
+
+biased.Mean()
+```
+
 
 ### Q3. [Think Stats Chapter 4 Exercise 2](4-2-random_dist.md) (random distribution)  
 This questions asks you to examine the function that produces random numbers.  Is it really random?  A good way to test that is to examine the pmf and cdf of the list of random numbers and visualize the distribution.  If you're not sure what pmf is, read more about it in Chapter 3.  
 
+Answer: The distribution is uniform becase the PMF is a horizontal line (same prob for all values) and the CDF is linear with slope = 1
+
+
+Code:
+```{python}
+sample = np.random.random(1000)
+
+
+pmf = thinkstats2.Pmf(sample)
+thinkplot.Pmf(pmf, linewidth=0.1)
+thinkplot.Config(xlabel='Random variate', ylabel='PMF')
+
+
+cdf = thinkstats2.Cdf(t)
+thinkplot.Cdf(cdf)
+thinkplot.Config(xlabel='Random variate', ylabel='CDF')
+
+
+```
+
 ### Q4. [Think Stats Chapter 5 Exercise 1](5-1-blue_men.md) (normal distribution of blue men)
 This is a classic example of hypothesis testing using the normal distribution.  The effect size used here is the Z-statistic. 
 
+In the BRFSS (see Section 5.4), the distribution of heights is roughly normal with parameters µ = 178 cm and σ = 7.7 cm for men, and µ = 163 cm and σ = 7.3 cm for women.
+In order to join Blue Man Group, you have to be male between 5’10” and 6’1” (see http://bluemancasting.com). What percentage of the U.S. male population is in this range? Hint: use scipy.stats.norm.cdf.
 
+Answer: 34.2 percent of the US male population
+
+
+Code:
+```{python}
+
+import scipy.stats
+
+    
+mu = 178
+sigma = 7.7
+
+low=177.8
+high=185.42
+
+below_low = scipy.stats.norm.cdf(low, mu, sigma)
+
+below_high = scipy.stats.norm.cdf(high, mu, sigma)
+
+answer = below_high - below_low
+    
+    
+```
 
 ### Q5. Bayesian (Elvis Presley twin) 
 
@@ -86,14 +223,28 @@ Bayes' Theorem is an important tool in understanding what we really know, given 
 
 Elvis Presley had a twin brother who died at birth.  What is the probability that Elvis was an identical twin? Assume we observe the following probabilities in the population: fraternal twin is 1/125 and identical twin is 1/300.  
 
->> REPLACE THIS TEXT WITH YOUR RESPONSE
+We have the prior information that Elvis did have a twin, so the probability he had a fraternal twin or identical twin is much higher than for the general population.
+
+If you use Bayes theorem the P(identical | twin) = (P(identical) * P(twin | identical) ) / P(twin)
+
+P(identical) = 1/300
+P(twin | identical) = 1
+P(twin) = P(fraternal) + P(identical) = (1/125) + (1/300) = (12/1500) + (5/1500) = (18/1500)
+
+Then plugging those values in, P(identical | twin) = 1500 / (300 * 18) = 0.278 or 27.8% chance Elvis had an identical twin
 
 ---
 
 ### Q6. Bayesian &amp; Frequentist Comparison  
 How do frequentist and Bayesian statistics compare?
 
->> REPLACE THIS TEXT WITH YOUR RESPONSE
+Frequentist Statistics
+There is a fixed unknown value for the parameter you are estimating. You can make your estimate by sampling the population, and frequentist methods (like p-value and confidence interval) allow you to know the level of confidence you can have in your estimate. This is based on models/distributions of how your estimates would fall if you repeated the sampling experiment an infinite number of times. 
+
+Bayesian Statistics
+There is also a fixed unknown value for the paramter you are estimating, but you make your estimate by continually updating the probability of values for the parameter and taking the maximum liklihood estimate. You start with some prior probability (or probability distribution) of a parameter from previous data, and update this with any new data. The probability of observing that new data, given your old prior probability, is used to create a new posterior probability. 
+
+Frequentists think that Bayesian statistics is too subjective, and Bayesians think that Frequentist statistics doesn't take into account previous knowledge (prior probabilities) enough.
 
 ---
 
@@ -104,8 +255,99 @@ The following exercises are optional, but we highly encourage you to complete th
 ### Q7. [Think Stats Chapter 7 Exercise 1](7-1-weight_vs_age.md) (correlation of weight vs. age)
 In this exercise, you will compute the effect size of correlation.  Correlation measures the relationship of two variables, and data science is about exploring relationships in data.    
 
+
+Answer:
+Pearson's correlation is 0.069
+Spearman's correlation is 0.095
+
+These are very low correlations, meaning a very weak or non-existant relationship between age and birth weight
+If Spearman is higher than Pearson, it might mean that the relationship isn't linear
+
+
+Code:
+```{python}
+import pandas as pd
+import np as np
+
+
+preg = nsfg.ReadFemPreg()
+live = preg[preg.outcome == 1 ]
+
+def Cov(xs, ys, meanx=None, meany=None):
+    xs = np.asarray(xs)
+    ys = np.asarray(ys)
+
+    if meanx is None:
+        meanx = np.mean(xs)
+    if meany is None:
+        meany = np.mean(ys)
+
+    cov = np.dot(xs-meanx, ys-meany) / len(xs)
+    return cov
+
+def SpearmanCorr(xs, ys):
+    xranks = pd.Series(xs).rank()
+    yranks = pd.Series(ys).rank()
+    return Corr(xranks, yranks)
+
+
+def Corr(xs, ys):
+    xs = np.asarray(xs)
+    ys = np.asarray(ys)
+
+    meanx, varx = thinkstats2.MeanVar(xs)
+    meany, vary = thinkstats2.MeanVar(ys)
+
+    corr = Cov(xs, ys, meanx, meany) / np.sqrt(varx * vary)
+    return corr
+    
+live = live.dropna(axis=0, subset=["agepreg", "totalwgt_lb"])
+
+ages = live.agepreg
+weights = live.totalwgt_lb
+print('Corr', Corr(ages, weights))
+print('SpearmanCorr', SpearmanCorr(ages, weights))
+
+
+thinkplot.Scatter(ages, weights)
+
+
+```
+
 ### Q8. [Think Stats Chapter 8 Exercise 2](8-2-sampling_dist.md) (sampling distribution)
 In the theoretical world, all data related to an experiment or a scientific problem would be available.  In the real world, some subset of that data is available.  This exercise asks you to take samples from an exponential distribution and examine how the standard error and confidence intervals vary with the sample size.
+
+
+Solution:
+
+standard error of lambda estimated from 1000 n=10 samples was 0.83
+
+the confidence interval is 1.25 to 3.67, 90 percent of estimates of lambda made from sampling this way would fall within this range
+
+
+I'm not sure how to put a plot in a markdown file 
+
+
+Code:
+
+```{python}
+
+l=2
+n=10
+l_estimates=[]
+for i in range(1000):
+    sample = np.random.exponential(scale=1/l, size=n)
+    l_estimate=1/np.mean(sample)
+    l_estimates.append(l_estimate)
+    
+standard_error = np.sqrt(np.mean([(estimate-l)**2 for estimate in l_estimates]))
+
+cdf = thinkstats2.Cdf(l_estimates)
+
+cdf.Percentile(5)
+
+cdf.Percentile(95)
+```
 
 ### Q9. [Think Stats Chapter 6 Exercise 1](6-1-household_income.md) (skewness of household income)
 ### Q10. [Think Stats Chapter 8 Exercise 3](8-3-scoring.md) (scoring)

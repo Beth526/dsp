@@ -8,7 +8,7 @@ Now compute the biased distribution we would see if we surveyed the children and
 
 Plot the actual and biased distributions, and compute their means. As a starting place, you can use chap03ex.ipynb. 
 
-Answer: The mean of the unbiased PMF is 1.02 and the mean of the biased PMF is 2.40. This is more than twice as large because of the bias.
+Answer: The mean of the unbiased PMF is 1.02 and the mean of the biased PMF is 2.40. This is more than twice as large because of the bias of asking children about the number of children in thier family (biased #/family), and not asking 1 caregiver per family
 
 
 
